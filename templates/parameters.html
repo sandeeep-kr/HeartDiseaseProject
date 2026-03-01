@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Parameters Guide — CardioPredict{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <section class="page-section">
+        <h1>Clinical Parameters Guide</h1>
+        <p>
+            The prediction model requires 13 clinical measurements. This page explains
+            each parameter in detail so you know exactly what to enter on the
+            <a href="/predict">Predict</a> page. If you're unsure about a value, consult
+            the patient's medical records or test reports.
+        </p>
+
+        <div class="params-list">
+            {% for feat in feature_names %}
+            {% set info = feature_info[feat] %}
+            <div class="param-card" id="param-{{ feat }}">
+                <div class="param-header">
+                    <span class="param-num">{{ loop.index }}</span>
+                    <h3>{{ info.label }}</h3>
+                </div>
+                <p class="param-help">{{ info.help }}</p>
+                <p class="param-detail">{{ info.detail }}</p>
+                <div class="param-meta">
+                    <div class="param-tag">
+                        <strong>Example:</strong> {{ info.example }}
+                    </div>
+                    <div class="param-tag">
+                        <strong>Normal range:</strong> {{ info.normal }}
+                    </div>
+                    {% if info.type == 'select' %}
+                    <div class="param-tag">
+                        <strong>Options:</strong>
+                        {% for val, label in info.options %}
+                        {{ label }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="cta-box">
+            <p>Now that you understand the parameters:</p>
+            <a href="/predict" class="btn btn-primary">Go to Prediction →</a>
+        </div>
+    </section>
+</div>
+{% endblock %}

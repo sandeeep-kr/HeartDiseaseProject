@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Predict — CardioPredict{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <section class="page-section">
+        <h1>Make a Prediction</h1>
+        <p>
+            Enter the patient's clinical parameters below. All 13 fields are required.
+            Not sure what a field means? Check the
+            <a href="/parameters">Parameters Guide</a> for detailed explanations.
+        </p>
+
+        <form method="POST" action="/predict" class="predict-form" id="heart-form">
+            {% for feat in feature_names %}
+            {% set info = feature_info[feat] %}
+            <div class="field" id="group-{{ feat }}">
+                <div class="field-header">
+                    <label for="{{ feat }}">{{ info.label }}</label>
+                    <button type="button" class="info-btn" data-field="{{ feat }}"
+                        aria-label="More info about {{ info.label }}">ⓘ</button>
+                </div>
+
+                {% if info.type == 'select' %}
+                <select name="{{ feat }}" id="{{ feat }}" required>
+                    <option value="" disabled selected>— Choose —</option>
+                    {% for val, label in info.options %}
+                    <option value="{{ val }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+                {% else %}
+                <input type="number" name="{{ feat }}" id="{{ feat }}" min="{{ info.min }}" max="{{ info.max }}"
+                    step="{{ info.step }}" placeholder="{{ info.placeholder }}" required>
+                {% endif %}
+
+                <div class="field-tip">{{ info.help }}</div>
+
+                <!-- Expandable info -->
+                <div class="info-panel" id="info-{{ feat }}">
+                    <p class="info-detail">{{ info.detail }}</p>
+                    <div class="info-meta">
+                        <span class="info-tag">📌 {{ info.example }}</span>
+                        <span class="info-tag">📊 {{ info.normal }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="predict-btn">Get Prediction</button>
+                <button type="reset" class="btn btn-secondary" id="reset-btn">Clear</button>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}History — CardioPredict{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <section class="page-section">
+        <h1>Prediction History</h1>
+        <p>
+            All predictions are stored in a local SQLite database. The last 100
+            predictions are shown below, most recent first.
+        </p>
+
+        {% if predictions|length == 0 %}
+        <div class="empty-state">
+            <p>No predictions yet.</p>
+            <a href="/predict" class="btn btn-primary">Make your first prediction →</a>
+        </div>
+        {% else %}
+        <p class="history-count">Showing {{ predictions|length }} prediction{{ 's' if predictions|length != 1 else ''
+            }}.</p>
+
+        <div class="table-scroll">
+            <table class="data-table history-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Date &amp; Time</th>
+                        <th>Age</th>
+                        <th>Sex</th>
+                        <th>Result</th>
+                        <th>Probability</th>
+                        <th>Risk Level</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in predictions %}
+                    <tr class="{% if row['prediction'] == 1 %}row-positive{% else %}row-negative{% endif %}">
+                        <td>{{ row['id'] }}</td>
+                        <td>{{ row['timestamp'] }}</td>
+                        <td>{{ row['age']|int }}</td>
+                        <td>{{ 'Male' if row['sex'] == 1 else 'Female' }}</td>
+                        <td>
+                            {% if row['prediction'] == 1 %}
+                            <span class="result-tag result-tag--danger">Disease</span>
+                            {% else %}
+                            <span class="result-tag result-tag--safe">Healthy</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ row['probability'] }}%</td>
+                        <td>
+                            <span class="risk-badge risk-badge--{{ row['risk_level']|lower|replace(' ', '-') }}">
+                                {{ row['risk_level'] }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

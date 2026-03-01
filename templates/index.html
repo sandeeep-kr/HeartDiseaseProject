@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}CardioPredict — Heart Disease Prediction System{% endblock %}
+
+{% block content %}
+<div class="wrap">
+
+    <section class="page-section">
+        <h1>Heart Disease Prediction System</h1>
+
+        <div class="about-content">
+            <div class="about-block">
+                <h2>About This Project</h2>
+                <p>
+                    This project was developed by <strong>Sandeep Kumar</strong> as a final-year
+                    academic project. It demonstrates how machine learning techniques can be
+                    applied to healthcare data to help with early screening of heart disease.
+                </p>
+                <p>
+                    Heart disease is one of the leading causes of death worldwide. Early detection
+                    is crucial for effective treatment and improved patient outcomes. This application
+                    uses a trained classification model to estimate the probability of heart disease
+                    based on 13 clinical parameters.
+                </p>
+            </div>
+
+            <div class="about-block">
+                <h2>How It Works</h2>
+                <ol class="steps-list">
+                    <li><strong>Learn about the model</strong> — Visit the <a href="/model-info">Model</a> page to see
+                        which algorithm was chosen and how it was evaluated.</li>
+                    <li><strong>Understand the parameters</strong> — The <a href="/parameters">Parameters</a> page
+                        explains each of the 13 clinical inputs, with normal ranges and examples.</li>
+                    <li><strong>Make a prediction</strong> — Go to the <a href="/predict">Predict</a> page, fill in the
+                        patient data, and get a probability score.</li>
+                    <li><strong>Review past results</strong> — The <a href="/history">History</a> page stores all past
+                        predictions in a database for reference.</li>
+                </ol>
+            </div>
+
+            <div class="about-block">
+                <h2>Dataset</h2>
+                <p>
+                    The model was trained on the
+                    <a href="https://archive.ics.uci.edu/ml/datasets/heart+disease" target="_blank">Cleveland Heart
+                        Disease dataset</a>
+                    from the UCI Machine Learning Repository.
+                </p>
+                <table class="about-table">
+                    <tr>
+                        <td>Source</td>
+                        <td>UCI Machine Learning Repository</td>
+                    </tr>
+                    <tr>
+                        <td>Records</td>
+                        <td>303 patient records</td>
+                    </tr>
+                    <tr>
+                        <td>Features</td>
+                        <td>13 clinical attributes</td>
+                    </tr>
+                    <tr>
+                        <td>Target</td>
+                        <td>Binary — heart disease vs. no heart disease</td>
+                    </tr>
+                    <tr>
+                        <td>Contributors</td>
+                        <td>Hungarian Institute of Cardiology, University Hospital Zurich, University Hospital Basel,
+                            V.A. Medical Center Long Beach</td>
+                    </tr>
+                </table>
+            </div>
+
+
+
+            <div class="about-block">
+                <h2>Quick Stats</h2>
+                <div class="intro-stats">
+                    <div class="intro-stat">
+                        <strong>{{ (metadata.test_metrics.accuracy * 100)|round(1) }}%</strong>
+                        <span>Test Accuracy</span>
+                    </div>
+                    <div class="intro-stat">
+                        <strong>{{ (metadata.test_metrics.roc_auc * 100)|round(1) }}%</strong>
+                        <span>ROC-AUC</span>
+                    </div>
+                    <div class="intro-stat">
+                        <strong>{{ (metadata.test_metrics.recall * 100)|round(1) }}%</strong>
+                        <span>Recall</span>
+                    </div>
+                    <div class="intro-stat">
+                        <strong>{{ metadata.best_model }}</strong>
+                        <span>Algorithm</span>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="cta-box">
+                <p>Ready to try it out?</p>
+                <a href="/predict" class="btn btn-primary">Go to Prediction →</a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

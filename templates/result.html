@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Result — CardioPredict{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    {% if error %}
+    <section class="result-section">
+        <div class="result-card result-card--error">
+            <h2>Something went wrong</h2>
+            <p>{{ error }}</p>
+            <a href="/" class="btn btn-primary">← Go back and try again</a>
+        </div>
+    </section>
+    {% else %}
+    <section class="result-section">
+        <div
+            class="result-card {% if result.prediction == 1 %}result-card--positive{% else %}result-card--negative{% endif %}">
+
+            <div class="result-verdict">
+                {% if result.prediction == 1 %}
+                <span class="result-icon result-icon--danger">⚠</span>
+                {% else %}
+                <span class="result-icon result-icon--safe">✓</span>
+                {% endif %}
+                <h2>{{ result.label }}</h2>
+            </div>
+
+            <span class="risk-badge risk-badge--{{ result.risk_level|lower|replace(' ', '-') }}">
+                {{ result.risk_level }}
+            </span>
+
+            <!-- Probability bar -->
+            <div class="prob-section">
+                <div class="prob-header">
+                    <span>Heart Disease Probability</span>
+                    <strong>{{ result.probability }}%</strong>
+                </div>
+                <div class="prob-track">
+                    <div class="prob-fill {% if result.probability > 70 %}prob-fill--high{% elif result.probability > 40 %}prob-fill--mid{% else %}prob-fill--low{% endif %}"
+                        style="width: {{ result.probability }}%;"></div>
+                </div>
+                <p class="prob-confidence">Model confidence: {{ result.confidence }}%</p>
+            </div>
+
+            <!-- Inputs table -->
+            <div class="inputs-table-wrap">
+                <h3>Parameters used</h3>
+                <table class="inputs-table">
+                    <tbody>
+                        {% for label, value in result.inputs.items() %}
+                        <tr>
+                            <td>{{ label }}</td>
+                            <td>{{ value }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="result-actions">
+                <a href="/" class="btn btn-primary">New Prediction</a>
+                <button onclick="window.print()" class="btn btn-secondary">Print Report</button>
+            </div>
+
+            <p class="disclaimer">
+                <strong>Disclaimer:</strong> This result is produced by a machine learning model
+                for <em>educational and research purposes only</em>. It is not a medical diagnosis.
+                Please consult a qualified healthcare professional for clinical decisions.
+            </p>
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

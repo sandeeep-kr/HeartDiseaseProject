@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% block title %}Model Details — CardioPredict{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <section class="page-section">
+        <h1>Model Details</h1>
+        <p>
+            This page documents the model selection process, evaluation metrics,
+            and the visualisations generated during training.
+        </p>
+
+        <!-- Best model -->
+        <div class="model-block">
+            <h2>Selected Model: {{ metadata.best_model }}</h2>
+            <p>
+                After comparing 7 classification algorithms using 10-fold stratified
+                cross-validation, <strong>{{ metadata.best_model }}</strong> was selected
+                as the best performer and fine-tuned using grid search.
+            </p>
+            <h3>Optimised Parameters</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key, value in metadata.best_params.items() %}
+                    <tr>
+                        <td><code>{{ key }}</code></td>
+                        <td>{{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Test metrics -->
+        <div class="model-block">
+            <h2>Test Set Performance</h2>
+            <p>Evaluated on a held-out 20% test set ({{ metadata.dataset_shape[0] // 5 }} samples).</p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for metric, value in metadata.test_metrics.items() %}
+                    <tr>
+                        <td>{{ metric|replace('_', ' ')|title }}</td>
+                        <td>
+                            <div class="metric-bar-row">
+                                <div class="metric-bar">
+                                    <div class="metric-bar-fill" style="width: {{ (value * 100)|round|int }}%;"></div>
+                                </div>
+                                <span>{{ (value * 100)|round(2) }}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Cross-validation -->
+        <div class="model-block">
+            <h2>Cross-Validation Comparison</h2>
+            <p>All 7 models were evaluated using 10-fold stratified cross-validation on the training set.</p>
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Mean Accuracy</th>
+                            <th>± Std Dev</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for model_name, scores in metadata.cross_validation.items() %}
+                        <tr {% if model_name==metadata.best_model %}class="highlight-row" {% endif %}>
+                            <td>
+                                {{ model_name }}
+                                {% if model_name == metadata.best_model %}<span class="badge">Best</span>{% endif %}
+                            </td>
+                            <td>{{ (scores.mean_cv_accuracy * 100)|round(2) }}%</td>
+                            <td>± {{ (scores.std_cv_accuracy * 100)|round(2) }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Visualisations -->
+        <div class="model-block">
+            <h2>Visualisations</h2>
+
+            <div class="vis-grid">
+                <div class="vis-item">
+                    <h3>Confusion Matrix</h3>
+                    <img src="{{ url_for('static', filename='confusion_matrix.png') }}"
+                        alt="Confusion matrix on the test set" loading="lazy">
+                </div>
+                <div class="vis-item">
+                    <h3>Model Comparison</h3>
+                    <img src="{{ url_for('static', filename='model_comparison.png') }}"
+                        alt="Comparison of model accuracies" loading="lazy">
+                </div>
+            </div>
+            <div class="vis-item vis-item--wide">
+                <h3>Feature Correlation Heatmap</h3>
+                <img src="{{ url_for('static', filename='correlation_heatmap.png') }}" alt="Feature correlation heatmap"
+                    loading="lazy">
+            </div>
+        </div>
+
+        <!-- Feature table -->
+        <div class="model-block">
+            <h2>Feature Descriptions</h2>
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Feature</th>
+                            <th>Description</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td><code>age</code></td>
+                            <td>Patient age in years</td>
+                            <td>Continuous</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><code>sex</code></td>
+                            <td>Biological sex (1 = male, 0 = female)</td>
+                            <td>Binary</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><code>cp</code></td>
+                            <td>Chest pain type (0–3)</td>
+                            <td>Categorical</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td><code>trestbps</code></td>
+                            <td>Resting blood pressure (mm Hg)</td>
+                            <td>Continuous</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td><code>chol</code></td>
+                            <td>Serum cholesterol (mg/dl)</td>
+                            <td>Continuous</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td><code>fbs</code></td>
+                            <td>Fasting blood sugar &gt; 120 mg/dl</td>
+                            <td>Binary</td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td><code>restecg</code></td>
+                            <td>Resting ECG results (0–2)</td>
+                            <td>Categorical</td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td><code>thalach</code></td>
+                            <td>Maximum heart rate achieved</td>
+                            <td>Continuous</td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td><code>exang</code></td>
+                            <td>Exercise-induced angina</td>
+                            <td>Binary</td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td><code>oldpeak</code></td>
+                            <td>ST depression induced by exercise</td>
+                            <td>Continuous</td>
+                        </tr>
+                        <tr>
+                            <td>11</td>
+                            <td><code>slope</code></td>
+                            <td>Slope of peak exercise ST segment</td>
+                            <td>Categorical</td>
+                        </tr>
+                        <tr>
+                            <td>12</td>
+                            <td><code>ca</code></td>
+                            <td>Major vessels coloured by fluoroscopy (0–3)</td>
+                            <td>Discrete</td>
+                        </tr>
+                        <tr>
+                            <td>13</td>
+                            <td><code>thal</code></td>
+                            <td>Thalassemia type</td>
+                            <td>Categorical</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
