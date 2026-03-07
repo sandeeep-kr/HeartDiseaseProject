@@ -35,3 +35,4 @@ htmlcov/
 # SQLite database (user data)
 *.db
 ~$*
+charts/
